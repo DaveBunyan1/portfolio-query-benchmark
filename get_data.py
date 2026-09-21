@@ -1,29 +1,30 @@
 import asyncio
 import time
 
-from sqlalchemy import case, func, select
+from sqlalchemy import text
 
 from database import async_session_maker
-from models import Transaction
 
 
 async def get_transaction_for_user(user_id: int):
-    total_shares = func.sum(Transaction.shares)
-    cost_basis = func.sum(Transaction.shares * Transaction.price_per_share)
-    avg_price_per_share = case((total_shares == 0, 0), else_=cost_basis / total_shares)
-    query = (
-        select(
-            Transaction.ticker.label("ticker"),
-            total_shares.label("shares"),
-            cost_basis.label("cost_basis"),
-            avg_price_per_share.label("price_per_share"),
-        )
-        .where(Transaction.user_id == user_id)
-        .group_by(Transaction.ticker)
+    sql = text(
+        """
+        SELECT 
+            ticker,
+            SUM(shares) AS shares,
+            SUM(shares * price_per_share) AS cost_basis,
+            CASE 
+                WHEN SUM(shares) = 0 THEN 0 
+                ELSE SUM(shares * price_per_share) / SUM(shares) 
+            END AS price_per_share
+        FROM transactions
+        WHERE user_id = :user_id
+        GROUP BY ticker;
+    """
     )
 
     async with async_session_maker() as session:
-        result = await session.execute(query)
+        result = await session.execute(sql, {"user_id": user_id})
         rows = result.all()
 
         for row in rows:
