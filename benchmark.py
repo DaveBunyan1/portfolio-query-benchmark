@@ -85,5 +85,5 @@ async def benchmark_and_log(
 
 if __name__ == "__main__":
     asyncio.run(
-        benchmark_and_log(user_id=2, runs=100, warmup=5, label="Pure aiosqlite")
+        benchmark_and_log(user_id=2, runs=100, warmup=5, label="SQL text in repo")
     )

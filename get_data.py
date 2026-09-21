@@ -1,33 +1,19 @@
 import asyncio
 import time
 
-import aiosqlite
-from sqlalchemy import text
-
 from database import async_session_maker
+from repository import PortfolioRepository
 
 DB_PATH = "./mydb.db"
 
 
 async def get_transaction_for_user(user_id: int):
-    sql = """
-        SELECT 
-            ticker,
-            SUM(shares) AS shares,
-            SUM(shares * price_per_share) AS cost_basis,
-            CASE 
-                WHEN SUM(shares) = 0 THEN 0 
-                ELSE SUM(shares * price_per_share) / SUM(shares) 
-            END AS price_per_share
-        FROM transactions
-        WHERE user_id = ?
-        GROUP BY ticker;
-    """
+    async with async_session_maker() as session:
+        repo = PortfolioRepository(session)
 
-    async with aiosqlite.connect(DB_PATH) as db:
-        async with db.execute(sql, (user_id,)) as cursor:
-            rows = await cursor.fetchall()
-            return rows
+        rows = await repo.get_user_portfolio(user_id)
+        for row in rows:
+            print(f"{row.ticker}: {row.shares} {row.cost_basis} {row.price_per_share}")
 
 
 if __name__ == "__main__":
