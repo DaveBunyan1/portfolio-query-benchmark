@@ -1,2 +1,0 @@
-Timestamp,Label,Runs,Min (ms),Median (ms),Avg (ms),P99 (ms),Max (ms)
-2026-09-21 19:44:01,Baseline yfinance,100,225.520,261.334,276.565,625.816,721.511
