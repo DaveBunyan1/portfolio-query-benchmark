@@ -22,7 +22,6 @@ Optimizations transitioned the query pipeline from an initial **~49ms** (unindex
 
 - **Composite Covering Index:** SQL aggregation latency optimized using a composite index on `transactions(user_id, ticker, shares, price_per_share)`.
 - **Read-Through Caching Pattern:** Batch price retrieval using Redis `MGET` pipelines with fallback fetching to prevent network thread lock.
-- **Protocol-Driven Interfaces:** Dependencies defined using `typing.Protocol` (Structural Typing) to decouple application services from concrete database repositories and market data vendors.
 - **Pure Math Engine:** In-memory PnL and weight calculation logic isolated into pure, zero-I/O helper functions for instant unit testing.
 
 ---
@@ -32,7 +31,7 @@ Optimizations transitioned the query pipeline from an initial **~49ms** (unindex
 - **Framework:** FastAPI / Python 3.11+
 - **Database:** SQLite / PostgreSQL with SQLAlchemy (Async Engine)
 - **Caching Layer:** Async Redis (`redis.asyncio`)
-- **Type Checking & Testing:** Mypy, `typing.Protocol`, Pytest
+- **Type Checking & Testing:** Mypy, Pytest
 
 ---
 
@@ -42,4 +41,16 @@ Optimizations transitioned the query pipeline from an initial **~49ms** (unindex
 
 ```bash
 docker run -d --name quant-redis -p 6379:6379 redis:alpine
+```
+
+### 2. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run Benchmark Suite
+
+```bash
+python benchmark_results.py
 ```
